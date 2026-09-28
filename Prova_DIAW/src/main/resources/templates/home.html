@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Candidatos TSE</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>Sistema de Consulta de Candidatos TSE</h1>
+    <p th:text="${totalEncontrado + ' candidato(s) encontrado(s)'}">
+        0 candidato(s) encontrado(s)
+    </p>
+</header>
+
+<main class="layout">
+
+    <aside class="filtros">
+        <h2>Filtros</h2>
+
+        <form method="get" th:action="@{/}">
+
+            <div class="filtro">
+                <h3>Gênero</h3>
+
+                <label>
+                    <input type="radio"
+                           name="genero"
+                           value=""
+                           th:checked="${generoSelecionado == ''}">
+                    Todos
+                </label>
+
+                <label th:each="g : ${generos}">
+                    <input type="radio"
+                           name="genero"
+                           th:value="${g}"
+                           th:checked="${g == generoSelecionado}">
+                    <span th:text="${g}">Gênero</span>
+                </label>
+            </div>
+
+            <div class="filtro">
+                <h3>Escolaridade</h3>
+
+                <select name="escolaridade">
+                    <option value=""
+                            th:selected="${escolaridadeSelecionada == ''}">
+                        Todas
+                    </option>
+
+                    <option th:each="esc : ${escolaridades}"
+                            th:value="${esc}"
+                            th:text="${esc}"
+                            th:selected="${esc == escolaridadeSelecionada}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="filtro">
+                <h3>Faixa etária</h3>
+
+                <label for="idadeMin">Idade mínima</label>
+                <input type="number"
+                       id="idadeMin"
+                       name="idadeMin"
+                       th:value="${idadeMin}">
+
+                <label for="idadeMax">Idade máxima</label>
+                <input type="number"
+                       id="idadeMax"
+                       name="idadeMax"
+                       th:value="${idadeMax}">
+
+            </div>
+
+            <button type="submit">Filtrar</button>
+
+            <a th:href="@{/}" class="limpar">Limpar</a>
+
+        </form>
+    </aside>
+
+    <section>
+
+        <div class="lista-candidatos" th:if="${!candidatos.isEmpty()}">
+
+            <article class="card-candidato" th:each="cand : ${candidatos}">
+
+                <img th:src="@{/images/candidatos/{arquivo}(arquivo=${cand.nomeArquivoFoto})}"
+                     th:alt="${cand.nomeUrna}"
+                     class="foto-candidato">
+
+                <div class="dados-candidato">
+
+                    <h2 th:text="${cand.nomeUrna}">
+                        Nome de urna
+                    </h2>
+
+                    <p th:text="${cand.cargo + ' · ' + cand.siglaPartido}">
+                        Cargo · Partido
+                    </p>
+
+                    <p>
+                        Número:
+                        <strong th:text="${cand.nrCandidato}">
+                            0000
+                        </strong>
+                    </p>
+
+                    <span th:classappend="${cand.genero == 'FEMININO'} ? ' etiqueta-f' : ' etiqueta-m'"
+                          th:text="${cand.genero}">
+                        Gênero
+                    </span>
+
+                    <p th:if="${cand.idade >= 0}">
+                        Idade:
+                        <span th:text="${cand.idade}">
+                            0
+                        </span>
+                    </p>
+
+                    <p th:if="${cand.grauInstrucao != null and !cand.grauInstrucao.isEmpty() and !cand.grauInstrucao.startsWith('#')}">
+                        Escolaridade:
+                        <span th:text="${cand.grauInstrucao}">
+                            Escolaridade
+                        </span>
+                    </p>
+
+                    <p th:if="${cand.ocupacao != null and !cand.ocupacao.isEmpty() and !cand.ocupacao.startsWith('#')}">
+                        Ocupação:
+                        <span th:text="${cand.ocupacao}">
+                            Ocupação
+                        </span>
+                    </p>
+
+                </div>
+
+            </article>
+
+        </div>
+
+        <div class="sem-resultados" th:if="${candidatos.isEmpty()}">
+            <h2>Nenhum candidato encontrado</h2>
+            <p>Tente alterar os filtros utilizados.</p>
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>
